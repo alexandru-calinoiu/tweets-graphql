@@ -1,15 +1,27 @@
 require "rails_helper"
 
 RSpec.describe TweetsSchema do
-  it "does the test query" do
+  it "creates tweets" do
     query_string = <<-GRAPHQL
-      query {
-        testField
-    }
+      mutation($input: TweetCreateInput!) {
+          tweetCreate(input: $input) {
+              tweet {
+                  id
+              }
+          }
+      }
     GRAPHQL
 
-    result = TweetsSchema.execute(query_string)
+    variables = {
+      "input": {
+        "attributes": {
+          "content": "Best thing I found in a while: https://12ft.io/"
+        }
+      }
+    }
 
-    expect(result["data"]["testField"]).to eq "Hello World!"
+    result = TweetsSchema.execute(query_string, variables: variables)
+
+    expect(result["data"]["tweetCreate"]["tweet"]["id"]).not_to be_nil
   end
 end
